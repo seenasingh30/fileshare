@@ -10,8 +10,10 @@ mongoose.connect(process.env.MONGO_URL,{ useUnifiedTopology: true,
 const connection = mongoose.connection;
 
   connection.once('open', function () {
-      console.log('MongoDB running');
+      console.log('connection established');
+      
     })
+
     .on('error', function (err) {
       console.log(err);
     });

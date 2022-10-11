@@ -1,7 +1,9 @@
 const res = require('express/lib/response');
 const multer = require('multer');
 const path = require("path");
-const File = require('../models/file');
+const fileDb = require('../models/file');
+const  sendMail= require('../service/emailservice');
+
 const { v4 : uuid4} = require('uuid');
 
 const router = require('express').Router();
@@ -36,14 +38,49 @@ router.post('/',upload.single("file"), async(req,res) => {
 });
 
 
-// router.post('/send',(req,res)=>{
-//     const {uuid,emailfrom,emailto}= req.body;
-//     if(!uuid  || !emailto !! !emailfrom){
-//         return res.status(422).send({error:'All fields are required'});
-//     }
-//     console file=await
+router.post('/send', async (req,res)=>{
+    console.log("send")
+    const {uuid,emailTo,emailFrom}= req.body;
+    if(!uuid  || !emailTo || !emailFrom){
+        return res.status(422).send({error:'All fields are required'});
+    }
+    //get data from database
+    
+    let filedata = await fileDb.findOne({uuid:uuid});
+    console.log(filedata)
+    if(filedata){
+        if(filedata.sender){
+            return res.status(422).send({error:'email already sent'});
+        }
+        else{
+            await fileDb(req.body).save()
+        }
+    }
+    else{
+        filedata =  await fileDb(req.body).save();
+        console.log("njnb",filedata)
+    }
+        //send email
+        
+    console.log(emailFrom)
+    sendMail({
+        from:emailFrom,
+        to:emailTo,
+        subject:'Transfer file sharing',
+        text:`${emailFrom} shared a file with u`,
+        html:require('../service/emailTemplates')(
+        {
+            emailForm:emailFrom,
+            downloadLink:`${process.env.APP_BASE_URL}/files/${filedata.uuid}`,
+            size:parseInt(1000)+'KB',
+            expires:'24 hours'
+        })
+    });
 
-// });
+   return res.send({success:true});
+
+
+ });
 
 
 module.exports = router;

@@ -1,32 +1,27 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require("mongoose");
 
+const fileSchema = mongoose.Schema(
+  {
+    filename: {
+      type: String,
+    },
+    pathname: {
+      type: String,
+    },
+    size: {
+      type: Number,
+    },
+    uuid: {
+      type: String,
+    },
+    sender: {
+      type: String,
 
-const fileSchema = new Schema({
- filename:{
-    type : String,
-    required : true
- },
- pathname:{
-    type : String,
-    required : true
- },
-size:{
-    type : Number,
-    required : true
- },
- uuid:{
-    type :String,
-    required : true
- },
- sender:{
-    type :String,
-    required : false
- },
- receiver:{
-    type :String,
-    required : false
- }
-
-} ,{timestamps : true});
-module.exports = mongoose.model('file',fileSchema);
+    },
+    receiver: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
+module.exports = mongoose.model("file", fileSchema);
