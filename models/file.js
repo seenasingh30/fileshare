@@ -20,7 +20,7 @@ const fileSchema = mongoose.Schema(
     },
     receiver: {
       type: String,
-    },
+    }
   },
   { timestamps: true }
 );
