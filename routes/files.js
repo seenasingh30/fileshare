@@ -17,13 +17,35 @@ let storage = multer.diskStorage({
 })
 let upload = multer({
     storage,
-    limit :{ fileSize:1000000 * 100},});
+    limit :{ fileSize:1000000 * 100},
+     fileFilter: (req, file, cb) => {
+              if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
+                cb(null, true);
+              } else {
+                cb(null, false);
+                return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
+              }
+            }
+   
+});
+router.post('/',upload.single("file"),async(req,res)=>{
+    upload(req, res, function (err) {
+        if (err instanceof multer.MulterError) {
+         res.send(err)
+        } else if (err) {
+          res.send(err)
+        }
+        console.log(req.file)
+        // Everything went fine.
+        return res.json({file:`${process.env.APP_BASE_URL}/files/${req.file.filename}`});
+      })
+});
 
 
 
 
-router.post('/',upload.single("file"), async(req,res) => {
-   console.log(req.file);
+// router.post('/',upload.single("file"), async(req,res) => {
+//    console.log(req.file);
         
 //    const file = new File({
 //     filename:req.file.filename,
